@@ -27,6 +27,7 @@ class DiscordWebsocket:
 
         self.bot_token = bot_token
         self.intents = intents
+        self.socket : aiohttp.ClientSession() = None
         self.GATEWAY_URL = 'wss://gateway.discord.gg/?v=9&encoding=json&compress=zlib-stream'
 
     async def __start_session(self):
@@ -55,3 +56,4 @@ class DiscordWebsocket:
         Sends a new hearbeat according to the heartbeat_interval variable.
         This is given in opcode 10's reply from the gateway.
         """
+        pass
