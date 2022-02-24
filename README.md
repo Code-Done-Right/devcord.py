@@ -14,7 +14,7 @@ Devcord is still in very early development stages, but the expected syntax will 
 import devcord
 from devcord.command_implements import SlashCommand, PrefixCommand
 
-INTENTS = devcord.intents.All_Enabled()
+INTENTS = devcord.Intents.All_Enabled()
 
 bot = devcord.BotUser(
         bot_token = '...',
