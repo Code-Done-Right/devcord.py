@@ -18,8 +18,8 @@ INTENTS = devcord.intents.All_Enabled()
 
 bot = devcord.BotUser(
         bot_token = '...',
-        prefixes = ['devcord', 'devcord.'],
-        intents = INTENTS
+        intents = INTENTS,
+        prefixes = ['devcord', 'devcord.']
     )
 
 @bot.command(implements = [SlashCommand, PrefixCommand])

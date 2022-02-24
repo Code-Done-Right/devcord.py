@@ -1,0 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Arvo&display=swap');
+
+body {
+    background-color: #131313;
+}
+
+.welcome-text-wrapper {
+    font-size: 2vw;
+    margin: 5vw;
+    color: #e0e0e0;
+    width: 90vw;
+    font-family: 'Arvo', serif;
+}
