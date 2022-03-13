@@ -1,6 +1,7 @@
 # Imports
 import aiohttp
 import asyncio
+from devcord import Intents
 
 import zlib
 import datetime
@@ -24,7 +25,7 @@ class GatewayWebSocket:
     - version? - The version of the gateway being connected to (defaulted to v9)
     """
 
-    def __init__(self, client, bot_token: str, intents: int, version: int = 9):
+    def __init__(self, client, bot_token: str, intents: int = Intents.Standard(), version: int = 9):
 
         # Client side and connection URL
         self.client = client
@@ -64,8 +65,8 @@ class GatewayWebSocket:
         return {
             "op": self.OPCODES["IDENTIFY"],
             "d": {
-                "token": "",
-                "intents": "",
+                "token": f"{self.bot_token}",
+                "intents": self.intents,
                 "properties": {
                     "$os": "linux",
                     "$browser": "devcord",
@@ -153,7 +154,7 @@ class GatewayWebSocket:
                     resume_json = {
                         "op": self.OPCODES["RESUME"],
                         "d": {
-                            "token": "",
+                            "token": f"{self.bot_token}",
                             "socket_id": self.socket_id,
                             "seq": 1337
                         }
