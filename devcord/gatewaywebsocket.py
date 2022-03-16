@@ -6,6 +6,7 @@ from devcord import Intents
 import zlib
 import datetime
 import json
+from colorama import Fore
 
 
 class GatewayWebSocket:
@@ -19,10 +20,10 @@ class GatewayWebSocket:
     https://discord.com/developers/docs/topics/gateway
 
     Parameters:
-    - client - The bot client user
-    - bot_token - The token of the bot
-    - intents - Snowflake storing bot intents
-    - version? - The version of the gateway being connected to (defaulted to v9)
+    - client: The bot client user
+    - bot_token: The token of the bot
+    - intents: Snowflake storing bot intents
+    - version?: The version of the gateway being connected to (defaulted to v9)
     """
 
     def __init__(self, client, bot_token: str, intents: int = Intents.Standard(), version: int = 9):
@@ -55,6 +56,9 @@ class GatewayWebSocket:
         self.ZLIB_SUFFIX = b'\x00\x00\xff\xff'
         self.BUFFER = bytearray()
         self.INFLATOR = zlib.decompressobj()
+
+        self.SUCCESS = Fore.GREEN
+        self.FAIL = Fore.RED
 
     async def identify_request(self):
         """
@@ -167,6 +171,11 @@ class GatewayWebSocket:
         """
         async with aiohttp.ClientSession as session:
             self.socket = await session.ws_connect(self.WSSGATEWAYURL)
+
+            print(self.SUCCESS + "Thanks for using devcord! <3")
+            print(
+                self.SUCCESS + "Want to contribute, view or just star our project? Visit our github! :D")
+            print(self.SUCCESS + "https://github.com/Code-Done-Right/devcord.py")
 
             # We listen to socket before heartbeat to find heartbeat_interval
             await asyncio.gather(
