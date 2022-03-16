@@ -1,13 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Arvo&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins&display=swap");
 
 body {
-    background-color: #131313;
+  background-color: #1f2730;
 }
 
-.welcome-text-wrapper {
-    font-size: 2vw;
-    margin: 5vw;
-    color: #e0e0e0;
-    width: 90vw;
-    font-family: 'Arvo', serif;
+.app-outer-wrapper {
+  margin-top: 40vh;
+  margin-left: 10vw;
+  margin-right: 10vw;
+  display: center;
+
+  font-family: "Poppins", sans-serif;
+  font-size: 2.5vw;
+
+  color: #edffed;
 }
