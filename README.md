@@ -4,7 +4,8 @@ Devcord is a basic Python based Discord API wrapper. The docs, when released, wi
 
 Devcord uses Discord's V9 API (The latest API version) and the latest Discord Gateway.
 
-We plan on suppporting Python 3.10, 3.9 and 3.8. However the module might work fine for versions 3.7 and 3.6, although it definitely will be a bit buggy. We recommend you, the user to run it in v3.10 if possible or v3.9.
+We plan on suppporting Python 3.10, 3.9 and 3.8. ~~However the module might work fine for versions 3.7 and 3.6, although it definitely will be a bit buggy. We recommend you, the user to run it in v3.10 if possible or v3.9.~~
+The wrapper will not work on versions below Python v3.8 (non inclusive).
 
 # 💻 Usage
 
