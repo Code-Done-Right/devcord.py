@@ -1,7 +1,7 @@
 import devcord
 from devcord.command_implements import SlashCommand, PrefixCommand
 
-INTENTS = devcord.intents.All()
+INTENTS = devcord.Intents.All()
 
 bot = devcord.BotUser(
     bot_token = '...',
