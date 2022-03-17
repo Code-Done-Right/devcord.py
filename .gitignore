@@ -1,2 +1,6 @@
-token.py
+# Cache files, import stuff, etc
+__pycache__
 node_modules
+
+# File secrets (token.py has a token for testing)
+token.py

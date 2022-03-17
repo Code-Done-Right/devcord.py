@@ -4,7 +4,6 @@ from aiohttp import ClientSession
 
 from base64 import b64decode
 
-
 class HTTPConnection:
     """
     The client sending requests related to the Discord REST API. Initialised
@@ -12,6 +11,10 @@ class HTTPConnection:
 
     For the implementation of sending embedded messages such as images, files, or
     embeds themselves, multipart will be implemented soon.
+
+    Parameters:
+    - bot_token: The token of the bot
+    - version: The API version
     """
 
     def __init__(self, bot_token: str, version: int):
@@ -28,3 +31,17 @@ class HTTPConnection:
             "MESSAGE": 3
         }
         self.CHAT_INPUT_REGEX = "^[\w-]{1,32}$"
+
+    def request(self, payload, session, parameters = None, files = None):
+        """
+        Sends a request to the Discord API when called with the right parameters.
+
+        Parameters:
+        - payload: The JSON payload to be requested. Make it a valid payload!
+        - session: The Client session.
+        - parameters?: The params for anything (TODO will be worked on)
+        - files?: Optional files to be sent to the API (TODO will also be worked on)
+        """
+        self.payload = payload
+        self.session = session
+        self.files = files
