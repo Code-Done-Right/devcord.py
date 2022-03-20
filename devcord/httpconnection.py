@@ -2,13 +2,13 @@
 import aiohttp
 from aiohttp import ClientSession
 
-from base64 import b64decode
 
 class HTTPConnection:
     """
     The client sending requests related to the Discord REST API. Initialised
     automatically at around the same time websocket is launched.
 
+    TODO:
     For the implementation of sending embedded messages such as images, files, or
     embeds themselves, multipart will be implemented soon.
 
@@ -18,27 +18,39 @@ class HTTPConnection:
     """
 
     def __init__(self, bot_token: str, version: int):
+        # Bot User
+        self.bot_token = bot_token
+        self.version = version
 
         # HTTP Client and API
-        self.client_id = b64decode(bot_token[:24])
         self.client: aiohttp.ClientSession = None
-        self.API_URL = f"https://discord.com/api/v{version}"
+        self.API_URL = f"https://discord.com/api/v{self.version}"
+        self.CDN_URL = f"https://cdn.discordapp.com/"
 
-        # Application commands
-        self.APPLICATION_COMMAND_TYPES = {
-            "CHAT_INPUT": 1,
-            "USER": 2,
-            "MESSAGE": 3
-        }
-        self.CHAT_INPUT_REGEX = "^[\w-]{1,32}$"
+    async def login(self):
+        """
+        Creates a completely new session.
 
-    def request(self, payload, session, parameters = None, files = None):
+        Refer:
+        https://discord.com/developers/docs/reference#http-api
+        """
+        if self.client:
+            await self.client.close()
+
+        self.client = aiohttp.ClientSession(headers =
+            {
+                "Authorization": f"Bot {self.bot_token}",
+                "User-Agent": "devcord (https://github.com/Code-Done-Right/devcord.py v1.0.0)"
+            }
+        )
+
+    async def request(self, payload, session, parameters = None, files = None):
         """
         Sends a request to the Discord API when called with the right parameters.
 
         Parameters:
         - payload: The JSON payload to be requested. Make it a valid payload!
-        - session: The Client session.
+        - session: The client session.
         - parameters?: The params for anything (TODO will be worked on)
         - files?: Optional files to be sent to the API (TODO will also be worked on)
         """

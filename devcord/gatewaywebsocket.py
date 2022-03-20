@@ -1,7 +1,7 @@
 # Imports
 import aiohttp
 import asyncio
-from devcord import Intents
+from devcord import Intents, GatewayErrors
 
 import zlib
 import datetime
@@ -120,11 +120,12 @@ class GatewayWebSocket:
             if data.type == aiohttp.WSMsgType.CLOSE:
                 await self.socket.close()
                 code = data.data
+                error = data.extra
 
                 # Raises an error if it's not a proper disconnect
                 # (https://discord.com/developers/docs/topics/gateway#disconnections)
                 if code is not (1000 or 1001):
-                    raise Exception
+                    raise GatewayErrors(code, error)
 
             # Handles any binary response using zlib
             elif data.type == aiohttp.WSMsgType.BINARY:
@@ -173,8 +174,7 @@ class GatewayWebSocket:
             self.socket = await session.ws_connect(self.WSSGATEWAYURL)
 
             print(self.SUCCESS + "Thanks for using devcord! <3")
-            print(
-                self.SUCCESS + "Want to contribute, view or just star our project? Visit our github! :D")
+            print(self.SUCCESS + "Want to contribute, view or just star our project? Visit our github! :D")
             print(self.SUCCESS + "https://github.com/Code-Done-Right/devcord.py")
 
             # We listen to socket before heartbeat to find heartbeat_interval
