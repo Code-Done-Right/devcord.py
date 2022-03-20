@@ -26,7 +26,13 @@ class GatewayWebSocket:
     - version?: The version of the gateway being connected to (defaulted to v9)
     """
 
-    def __init__(self, client, bot_token: str, intents: int = Intents.Standard(), version: int = 9):
+    def __init__(
+        self,
+        client,
+        bot_token: str,
+        intents: int = Intents.Standard(),
+        version: int = 9,
+    ):
 
         # Client side and connection URL
         self.client = client
@@ -49,11 +55,11 @@ class GatewayWebSocket:
             "REQUEST GUILD MEMBERS": 8,
             "INVALID socket": 9,
             "HELLO": 10,
-            "HEARTBEAT ACK": 11
+            "HEARTBEAT ACK": 11,
         }
 
         # Miscellaneous
-        self.ZLIB_SUFFIX = b'\x00\x00\xff\xff'
+        self.ZLIB_SUFFIX = b"\x00\x00\xff\xff"
         self.BUFFER = bytearray()
         self.INFLATOR = zlib.decompressobj()
 
@@ -74,9 +80,9 @@ class GatewayWebSocket:
                 "properties": {
                     "$os": "linux",
                     "$browser": "devcord",
-                    "$device": "devcord"
-                }
-            }
+                    "$device": "devcord",
+                },
+            },
         }
 
     async def send_new_heartbeat(self, socket: aiohttp.ClientWebSocketResponse):
@@ -89,9 +95,7 @@ class GatewayWebSocket:
 
         """
         if not socket.closed:
-            await socket.send_json({
-                "op": self.OPCODES["HEARTBEAT"]
-            })
+            await socket.send_json({"op": self.OPCODES["HEARTBEAT"]})
 
     async def keep_ws_alive(self):
         """
@@ -161,8 +165,8 @@ class GatewayWebSocket:
                         "d": {
                             "token": f"{self.bot_token}",
                             "socket_id": self.socket_id,
-                            "seq": 1337
-                        }
+                            "seq": 1337,
+                        },
                     }
                     await self.socket.send_json(resume_json)
 
@@ -174,11 +178,11 @@ class GatewayWebSocket:
             self.socket = await session.ws_connect(self.WSSGATEWAYURL)
 
             print(self.SUCCESS + "Thanks for using devcord! <3")
-            print(self.SUCCESS + "Want to contribute, view or just star our project? Visit our github! :D")
+            print(
+                self.SUCCESS
+                + "Want to contribute, view or just star our project? Visit our github! :D"
+            )
             print(self.SUCCESS + "https://github.com/Code-Done-Right/devcord.py")
 
             # We listen to socket before heartbeat to find heartbeat_interval
-            await asyncio.gather(
-                self.listen_to_socket(),
-                self.keep_ws_alive
-            )
+            await asyncio.gather(self.listen_to_socket(), self.keep_ws_alive)

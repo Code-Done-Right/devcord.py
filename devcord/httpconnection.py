@@ -37,14 +37,14 @@ class HTTPConnection:
         if self.client:
             await self.client.close()
 
-        self.client = aiohttp.ClientSession(headers =
-            {
+        self.client = aiohttp.ClientSession(
+            headers={
                 "Authorization": f"Bot {self.bot_token}",
-                "User-Agent": "devcord (https://github.com/Code-Done-Right/devcord.py v1.0.0)"
+                "User-Agent": "devcord (https://github.com/Code-Done-Right/devcord.py v1.0.0)",
             }
         )
 
-    async def request(self, payload, session, parameters = None, files = None):
+    async def request(self, payload, session, parameters=None, files=None):
         """
         Sends a request to the Discord API when called with the right parameters.
 
