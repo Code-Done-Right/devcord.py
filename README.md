@@ -1,6 +1,6 @@
 # ❓ Devcord
 
-Devcord is a basic Python based Discord API wrapper. The docs, when released, will be linked soon.
+Devcord is a basic Python based Discord API wrapper. The docs, when released, will be linked soon!
 
 Devcord uses Discord's V9 API (The latest API version) and the latest Discord Gateway.
 
