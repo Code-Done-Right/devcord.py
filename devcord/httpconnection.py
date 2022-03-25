@@ -20,7 +20,7 @@ class HTTPConnection:
     - version: The API version
     """
 
-    def __init__(self, bot_token: str, boundary, version: int):
+    def __init__(self, bot_token: str, version: int, boundary="boundary"):
         # Bot User
         self.bot_token = bot_token
         self.version = version

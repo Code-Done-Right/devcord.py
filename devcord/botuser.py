@@ -2,6 +2,7 @@
 import devcord
 from devcord import HTTPConnection, GatewayWebSocket
 
+import asyncio
 
 class BotUser:
     """
@@ -16,7 +17,32 @@ class BotUser:
     prefix commands and/or slash commands.
     """
 
-    def __init__(self, bot_token, intents=devcord.Intents.Standard(), prefixes=None):
+    def __init__(self, *, bot_token, intents=devcord.Intents.Standard(), prefixes=None):
         self.bot_token = bot_token
         self.intents = intents
         self.prefixes = prefixes
+
+        self.ws = GatewayWebSocket("placeholder", self.bot_token, self.intents)
+        self.http = HTTPConnection("placeholder", 9)
+
+    async def create_session(self, bot_token):
+        if not bot_token:
+            bot_token = ""
+
+        await self.http.login()
+        await self.ws.start()
+
+    async def run(self):
+        loop = asyncio.get_event_loop()
+        task = loop.create_task(self.create_session(self.bot_token))
+
+        try:
+            loop.run_until_complete(task)
+        except KeyboardInterrupt:
+            task.cancel()
+
+            if self.ws and self.ws.sock:
+                loop.run_until_complete(self.ws.sock.close())
+
+            if self.http and self.http.session:
+                loop.run_until_complete(self.http.session.close())
