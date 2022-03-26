@@ -1,8 +1,10 @@
 # Imports
 import devcord
-from devcord import HTTPConnection, GatewayWebSocket
+from devcord.httpconnection import HTTPConnection
+from devcord.gatewaywebsocket import GatewayWebSocket
 
 import asyncio
+
 
 class BotUser:
     """
@@ -32,7 +34,7 @@ class BotUser:
         await self.http.login()
         await self.ws.start()
 
-    async def run(self):
+    def run(self):
         loop = asyncio.get_event_loop()
         task = loop.create_task(self.create_session(self.bot_token))
 

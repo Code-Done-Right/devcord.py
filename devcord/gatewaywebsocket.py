@@ -176,6 +176,9 @@ class GatewayWebSocket:
         """
         Starts the websocket connecting to the Discord Gateway.
         """
+        if self.socket:
+            await self.socket.close()
+
         async with aiohttp.ClientSession as session:
             self.socket = await session.ws_connect(self.WSSGATEWAYURL)
 
