@@ -2,5 +2,5 @@
 __pycache__
 node_modules
 
-# File secrets (token.py has a token for testing)
-token.py
+# Extra stuff
+extras
