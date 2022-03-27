@@ -158,7 +158,7 @@ class GatewayWebSocket:
                 if json_payload["op"] == self.OPCODES["READY"]:
                     self.socket_id = json_payload["socket_id"]
 
-                # TODO: Call event listeners when BotUser is done
+                # TODO: Call event listeners when the class BotUser is done
 
                 # Reconnect in case of any errors/gateway demand
                 if json_payload["op"] == self.OPCODES["RECONNECT"]:
