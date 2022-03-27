@@ -8,7 +8,7 @@ import asyncio
 
 class BotUser:
     """
-    The class containing the bot user information. When initiated with valid params,
+    The class containing the bot user information. When initiated with valid parameters,
     it connects to the API and gateway.
 
     Parameters:
