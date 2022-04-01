@@ -31,7 +31,7 @@ class GatewayWebSocket:
         client,
         bot_token: str,
         intents: int = Intents.Standard(),
-        version: int = 9,
+        version: int = 10,
     ):
 
         # Client side and connection URL
@@ -109,13 +109,14 @@ class GatewayWebSocket:
                 await asyncio.sleep(self.heartbeat_interval * 1000)
 
                 await self.send_new_heartbeat(self.socket)
+                print("heartbeat sent")
 
     async def listen_to_socket(self):
         """
         Listens to all gateway events and responds to them.
         """
         while self.socket:
-            data = self.socket.receive()
+            data = await self.socket.receive()
             payload = data.data()
 
             # The below code checks if the gateway sent any events to the user.
@@ -191,4 +192,4 @@ class GatewayWebSocket:
             print(self.SUCCESS + "https://github.com/Code-Done-Right/devcord.py")
 
             # We listen to socket before heartbeat to find heartbeat_interval
-            await asyncio.gather(self.listen_to_socket(), self.keep_ws_alive)
+            await asyncio.gather(self.listen_to_socket(), self.keep_ws_alive())

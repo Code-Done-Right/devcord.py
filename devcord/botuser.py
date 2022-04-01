@@ -25,7 +25,7 @@ class BotUser:
         self.prefixes = prefixes
 
         self.ws = GatewayWebSocket("placeholder", self.bot_token, self.intents)
-        self.http = HTTPConnection("placeholder", 9)
+        self.http = HTTPConnection("placeholder", 10)
 
     async def create_session(self, bot_token):
         if not bot_token:
@@ -43,8 +43,8 @@ class BotUser:
         except KeyboardInterrupt:
             task.cancel()
 
-            if self.ws and self.ws.sock:
-                loop.run_until_complete(self.ws.sock.close())
+            if self.ws and self.ws.socket:
+                loop.run_until_complete(self.ws.socket.close())
 
-            if self.http and self.http.session:
-                loop.run_until_complete(self.http.session.close())
+            if self.http and self.http.client:
+                loop.run_until_complete(self.http.client.close())
