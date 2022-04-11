@@ -1,5 +1,6 @@
 # Imports
 import aiohttp
+from aiohttp import WSMsgType
 import asyncio
 from devcord import Intents, GatewayErrors
 
@@ -28,17 +29,15 @@ class GatewayWebSocket:
 
     def __init__(
         self,
-        client,
         bot_token: str,
         intents: int = Intents.Standard(),
         version: int = 10,
     ):
 
         # Client side and connection URL
-        self.client = client
         self.bot_token = bot_token
 
-        self.WSSGATEWAYURL = f"wss://gateway.discord.gg/?v={version}&encoding=json"
+        self.WSSGATEWAYURL = f"wss://gateway.discord.gg/?v={version}&encoding=json&compress=zlib-stream"
         self.intents = intents
         self.socket: aiohttp.ClientSession = None
 
@@ -58,21 +57,7 @@ class GatewayWebSocket:
             "HEARTBEAT ACK": 11,
         }
 
-        # Miscellaneous
-        self.ZLIB_SUFFIX = b"\x00\x00\xff\xff"
-        self.BUFFER = bytearray()
-        self.INFLATOR = zlib.decompressobj()
-
-        self.SUCCESS = Fore.GREEN
-        self.FAIL = Fore.RED
-
-    async def identify_request(self):
-        """
-        Sends an `IDENTIFY` packet to the gateway to start the connection.
-        Occurs whenever you want to start a new session or reconnect the socket after
-        a sudden non-graceful closing of the connection.
-        """
-        return {
+        self.IDENTIFY_REQ = {
             "op": self.OPCODES["IDENTIFY"],
             "d": {
                 "token": f"{self.bot_token}",
@@ -84,6 +69,14 @@ class GatewayWebSocket:
                 },
             },
         }
+
+        # Miscellaneous
+        self.ZLIB_SUFFIX = b"\x00\x00\xff\xff"
+        self.BUFFER = bytearray()
+        self.INFLATOR = zlib.decompressobj()
+
+        self.SUCCESS = Fore.GREEN
+        self.FAIL = Fore.RED
 
     async def send_new_heartbeat(self, socket: aiohttp.ClientWebSocketResponse):
         """
@@ -117,12 +110,12 @@ class GatewayWebSocket:
         """
         while self.socket:
             data = await self.socket.receive()
-            payload = data.data()
+            payload = data.data
 
             # The below code checks if the gateway sent any events to the user.
 
             # Closes the websocket if the gateway orders you to cancel it
-            if data.type == aiohttp.WSMsgType.CLOSE:
+            if data.type == WSMsgType.CLOSE:
                 await self.socket.close()
                 code = data.data
                 error = data.extra
@@ -133,45 +126,44 @@ class GatewayWebSocket:
                     raise GatewayErrors(code, error)
 
             # Handles any binary response using zlib
-            elif data.type == aiohttp.WSMsgType.BINARY:
-                self.BUFFER.extend(data)
+            elif data.type == WSMsgType.BINARY:
+                self.BUFFER.extend(payload)
 
                 # Payload compression handling
-                if data[-4:] == self.ZLIB_SUFFIX:
-                    data = self.INFLATOR.decompress()
+                if payload[-4:] == self.ZLIB_SUFFIX:
+                    payload = self.INFLATOR.decompress(self.BUFFER)
 
                 # Transport compression handling, in which it uses regular compression,
                 # without the extra compression to binary format.
                 else:
-                    data = zlib.decompress(data)
+                    payload = zlib.decompress(payload)
 
-            if data.type == aiohttp.WSMsgType.TEXT or aiohttp.WSMsgType.BINARY:
-                json_payload = json.loads(payload)
+            json_payload = json.loads(payload)
 
-                # Finds the heartbeat_interval and send `IDENTIFY`!
-                if json_payload["op"] == self.OPCODES["HELLO"]:
-                    self.heartbeat_interval = json_payload["d"]["heartbeat_interval"]
+            # Finds the heartbeat_interval and send `IDENTIFY`!
+            if json_payload["op"] == self.OPCODES["HELLO"]:
+                self.heartbeat_interval = json_payload["d"]["heartbeat_interval"]
 
-                    identify_json = self.identify_request()
-                    await self.socket.send_json(identify_json)
+                await self.socket.send_json(self.IDENTIFY_REQ)
 
-                # Handles `READY` response
-                if json_payload["op"] == self.OPCODES["READY"]:
-                    self.socket_id = json_payload["socket_id"]
+            # # Handles `READY` response
+            # if json_payload["op"] == self.OPCODES["DISPATCH"]:
+            #     if json_payload["t"] == "READY":
+            #         self.socket_id = json_payload["socket_id"]
 
-                # TODO: Call event listeners when the class BotUser is done
+            # TODO: Call event listeners when the class BotUser is done
 
-                # Reconnect in case of any errors/gateway demand
-                if json_payload["op"] == self.OPCODES["RECONNECT"]:
-                    resume_json = {
-                        "op": self.OPCODES["RESUME"],
-                        "d": {
-                            "token": f"{self.bot_token}",
-                            "socket_id": self.socket_id,
-                            "seq": 1337,
-                        },
-                    }
-                    await self.socket.send_json(resume_json)
+            # Reconnect in case of any errors/gateway demand
+            if json_payload["op"] == self.OPCODES["RECONNECT"]:
+                resume_json = {
+                    "op": self.OPCODES["RESUME"],
+                    "d": {
+                        "token": f"{self.bot_token}",
+                        "socket_id": self.socket_id,
+                        "seq": 1337,
+                    },
+                }
+                await self.socket.send_json(resume_json)
 
     async def start(self):
         """
@@ -189,7 +181,8 @@ class GatewayWebSocket:
                 self.SUCCESS
                 + "Want to contribute, view or just star our project? Visit our github! :D"
             )
-            print(self.SUCCESS + "https://github.com/Code-Done-Right/devcord.py")
+            print(self.SUCCESS +
+                  "https://github.com/Code-Done-Right/devcord.py" + Fore.RESET)
 
             # We listen to socket before heartbeat to find heartbeat_interval
             await asyncio.gather(self.listen_to_socket(), self.keep_ws_alive())

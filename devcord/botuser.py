@@ -24,15 +24,16 @@ class BotUser:
         self.intents = intents
         self.prefixes = prefixes
 
-        self.ws = GatewayWebSocket("placeholder", self.bot_token, self.intents)
-        self.http = HTTPConnection("placeholder", 10)
+        self.ws = GatewayWebSocket(self.bot_token, self.intents)
+        self.http = HTTPConnection(self.bot_token, 10)
 
     async def create_session(self, bot_token):
         if not bot_token:
-            bot_token = ""
+            raise devcord.InvalidSessionError("bot_token")
 
-        await self.http.login()
-        await self.ws.start()
+        else:
+            await self.http.login()
+            await self.ws.start()
 
     def run(self):
         loop = asyncio.get_event_loop()
@@ -48,3 +49,16 @@ class BotUser:
 
             if self.http and self.http.client:
                 loop.run_until_complete(self.http.client.close())
+
+            raise devcord.InterruptError(error_type=KeyboardInterrupt)
+
+        except Exception:
+            task.cancel()
+
+            if self.ws and self.ws.socket:
+                loop.run_until_complete(self.ws.socket.close())
+
+            if self.http and self.http.client:
+                loop.run_until_complete(self.http.client.close())
+
+            raise devcord.InterruptError(error_type=Exception)
