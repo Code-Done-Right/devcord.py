@@ -132,6 +132,7 @@ class GatewayWebSocket:
                 # Payload compression handling
                 if payload[-4:] == self.ZLIB_SUFFIX:
                     payload = self.INFLATOR.decompress(self.BUFFER)
+                    self.BUFFER = bytearray()
 
                 # Transport compression handling, in which it uses regular compression,
                 # without the extra compression to binary format.
