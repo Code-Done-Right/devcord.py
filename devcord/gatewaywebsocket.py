@@ -70,6 +70,9 @@ class GatewayWebSocket:
             },
         }
 
+        self.first_heartbeat = True
+        self.JITTER = 0.2
+
         # Miscellaneous
         self.ZLIB_SUFFIX = b"\x00\x00\xff\xff"
         self.BUFFER = bytearray()
@@ -78,18 +81,6 @@ class GatewayWebSocket:
         self.SUCCESS = Fore.GREEN
         self.FAIL = Fore.RED
 
-    async def send_new_heartbeat(self, socket: aiohttp.ClientWebSocketResponse):
-        """
-        Sends a new heartbeat accoding to the heartbeat_interval given
-        in the `HELLO` packet.
-
-        Parameters:
-            - socket (`aiohttp.ClientWebSocketResponse`): Socket for sending the heartbeat.
-
-        """
-        if not socket.closed:
-            await socket.send_json({"op": self.OPCODES["HEARTBEAT"]})
-
     async def keep_ws_alive(self):
         """
         Keeps the websocket alive by sending heartbeats determined by
@@ -97,12 +88,19 @@ class GatewayWebSocket:
         Returns `HEARTBEAT_ACK`s from the gateway when heartbeats are sent.
         """
         while self.socket:
-            if self.heartbeat_interval:
-                # Ran only if heartbeat_interval exists AND session exists
-                await asyncio.sleep(self.heartbeat_interval * 1000)
+            if type(self.heartbeat_interval) == int:
+                if self.first_heartbeat == True:
+                    # Ran only if this is the first heartbeat
+                    await asyncio.sleep(self.heartbeat_interval * 1000 * self.JITTER)
 
-                await self.send_new_heartbeat(self.socket)
-                print("heartbeat sent")
+                    await self.socket.send_json({"op": self.OPCODES["HEARTBEAT"]})
+                    self.first_heartbeat = False
+
+                else:
+                    # Ran only if this is not first heartbeat interval
+                    await asyncio.sleep(self.heartbeat_interval * 1000)
+
+                    await self.socket.send_json({"op": self.OPCODES["HEARTBEAT"]})
 
     async def listen_to_socket(self):
         """
@@ -147,10 +145,8 @@ class GatewayWebSocket:
 
                 await self.socket.send_json(self.IDENTIFY_REQ)
 
-            # # Handles `READY` response
-            # if json_payload["op"] == self.OPCODES["DISPATCH"]:
-            #     if json_payload["t"] == "READY":
-            #         self.socket_id = json_payload["socket_id"]
+            elif json_payload["op"] == self.OPCODES["HEARTBEAT ACK"]:
+                print("placeholder")
 
             # TODO: Call event listeners when the class BotUser is done
 
@@ -184,6 +180,7 @@ class GatewayWebSocket:
             )
             print(self.SUCCESS +
                   "https://github.com/Code-Done-Right/devcord.py" + Fore.RESET)
+            print(self.SUCCESS + "Tip: Focus on the red text if any errors come, and don't forget to report to our discord!" + Fore.RESET)
 
             # We listen to socket before heartbeat to find heartbeat_interval
             await asyncio.gather(self.listen_to_socket(), self.keep_ws_alive())

@@ -1,3 +1,6 @@
+from colorama import Fore
+
+
 class GatewayErrors(Exception):
     """
     A class raising errors if an error is returned by the gateway.
@@ -9,7 +12,7 @@ class GatewayErrors(Exception):
 
     def __init__(self, code, error):
         print(
-            "Oops! An error was raised by the gateway. Visit:\nhttps://discord.com/developers/docs/topics/opcodes-and-status-codes#gateway-gateway-close-event-codes"
+            Fore.RED + "Oops! An error was raised by the gateway. Visit:\nhttps://discord.com/developers/docs/topics/opcodes-and-status-codes#gateway-gateway-close-event-codes" + Fore.RESET
         )
 
         if code == 4000:
@@ -58,4 +61,4 @@ class GatewayErrors(Exception):
         else:
             final = "We're confused, we got an error we never got before.\nTry reporting this to our discord server and please paste the error and code. Thanks!"
 
-        super().__init__(final)
+        super().__init__(Fore.RED + final + Fore.RESET)
