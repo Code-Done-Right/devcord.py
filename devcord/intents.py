@@ -1,3 +1,8 @@
+"""
+Intent calculators and intent handlers.
+"""
+
+
 class Intents:
     """
     Calculates the intent value based on the intent(s) chosen.
@@ -17,7 +22,7 @@ class Intents:
         The standard intents, i.e. includes only the non-priviledged intents.
         The only Priviledged intents as of March, 2022 are `GUILD_PRESENCES` and `GUILD_MEMBERS`.
         """
-        INTENTS = {
+        intents = {
             "GUILDS": 1 << 0,
             "GUILD_MEMBERS": 1 << 1,
             "GUILD_BANS": 1 << 2,
@@ -36,8 +41,8 @@ class Intents:
             "GUILD_SCHEDULED_EVENTS": 1 << 16,
         }
         intent_num = 0
-        for key, value in INTENTS.items():
-            if key != "GUILD_PRESENCES" or "GUILD_MEMBERS":
+        for key, value in intents.items():
+            if key not in ("GUILD_PRESENCES", "GUILD_MEMBERS"):
                 intent_num += value
 
         return intent_num
@@ -47,7 +52,7 @@ class Intents:
         """
         All intents are included with this option.
         """
-        INTENTS = {
+        intents = {
             "GUILDS": 1 << 0,
             "GUILD_MEMBERS": 1 << 1,
             "GUILD_BANS": 1 << 2,
@@ -66,7 +71,7 @@ class Intents:
             "GUILD_SCHEDULED_EVENTS": 1 << 16,
         }
         intent_num = 0
-        for _, value in INTENTS.items():
+        for _, value in intents.items():
             intent_num += value
 
         return intent_num

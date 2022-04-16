@@ -1,3 +1,6 @@
+"""
+A module storing all documented gateway errors.
+"""
 from colorama import Fore
 
 
@@ -12,8 +15,9 @@ class GatewayErrors(Exception):
 
     def __init__(self, code, error):
         print(
-            Fore.RED + "Oops! An error was raised by the gateway. Visit:\nhttps://discord.com/developers/docs/topics/opcodes-and-status-codes#gateway-gateway-close-event-codes" + Fore.RESET
+            Fore.RED + "Oops! An error was raised by the gateway." + Fore.RESET
         )
+        print(Fore.RED + "Visit:\nhttps://discord.com/developers/docs/topics/opcodes-and-status-codes#gateway-gateway-close-event-codes" + Fore.RESET)
 
         if code == 4000:
             final = f"\n ERR {code}\n\nUnknown error\n{error}"
@@ -51,14 +55,12 @@ class GatewayErrors(Exception):
         elif code == 4012:
             final = f"\n ERR {code}\n\nInvalid API version\n{error}"
 
-        elif code == 4013:
-            final = f"\n ERR {code}\n\nInvalid Intents\n{error}"
-
-        elif code == 4014:
-            final = f"\n ERR {code}\n\nDisallowed intents\n{error}"
+        elif code in (4013, 4014):
+            final = f"\n ERR {code}\n\nInvalid or Disallowed Intents\n{error}"
 
         # Final check (should not run at all)
         else:
-            final = "We're confused, we got an error we never got before.\nTry reporting this to our discord server and please paste the error and code. Thanks!"
+            final = "We're confused, we got an error we never got before.\nTry reporting this \
+            to our discord server. Thanks!"
 
         super().__init__(Fore.RED + final + Fore.RESET)

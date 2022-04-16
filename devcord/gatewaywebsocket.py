@@ -1,13 +1,18 @@
+"""
+A module containing everything that is related to the web socket connection
+to the Discord Gateway. The default is v10.
+"""
+
+
 # Imports
+import zlib
+import json
+from colorama import Fore
+
 import aiohttp
 from aiohttp import WSMsgType
 import asyncio
 from devcord import Intents, GatewayErrors
-
-import zlib
-import datetime
-import json
-from colorama import Fore
 
 
 class GatewayWebSocket:
@@ -37,13 +42,13 @@ class GatewayWebSocket:
         # Client side and connection URL
         self.bot_token = bot_token
 
-        self.WSSGATEWAYURL = f"wss://gateway.discord.gg/?v={version}&encoding=json&compress=zlib-stream"
+        self.wssurl = f"wss://gateway.discord.gg/?v={version}&encoding=json&compress=zlib-stream"
         self.intents = intents
         self.socket: aiohttp.ClientSession = None
 
         # Gateway events and heartbeats
         self.heartbeat_interval: int = None
-        self.OPCODES = {
+        self.opcodes = {
             "DISPATCH": 0,
             "HEARTBEAT": 1,
             "IDENTIFY": 2,
@@ -57,8 +62,8 @@ class GatewayWebSocket:
             "HEARTBEAT ACK": 11,
         }
 
-        self.IDENTIFY_REQ = {
-            "op": self.OPCODES["IDENTIFY"],
+        self.identify_req = {
+            "op": self.opcodes["IDENTIFY"],
             "d": {
                 "token": f"{self.bot_token}",
                 "intents": self.intents,
@@ -70,16 +75,16 @@ class GatewayWebSocket:
             },
         }
 
-        self.JITTER = 0.69420
+        self.jitter = 0.69420
         self.first_heartbeat: bool = True
 
         # Miscellaneous
-        self.ZLIB_SUFFIX = b"\x00\x00\xff\xff"
-        self.BUFFER = bytearray()
-        self.INFLATOR = zlib.decompressobj()
+        self.zlib_suffix = b"\x00\x00\xff\xff"
+        self.buffer = bytearray()
+        self.inflator = zlib.decompressobj()
 
-        self.SUCCESS = Fore.GREEN
-        self.FAIL = Fore.RED
+        self.success = Fore.GREEN
+        self.fail = Fore.RED
 
     async def keep_ws_alive(self):
         """
@@ -88,12 +93,12 @@ class GatewayWebSocket:
         Returns `HEARTBEAT_ACK`s from the gateway when heartbeats are sent.
         """
         while self.socket:
-            if type(self.heartbeat_interval) == int:
-                if self.first_heartbeat == True:
-                    await asyncio.sleep(self.heartbeat_interval / 1000 * self.JITTER)
+            if isinstance(self.heartbeat_interval, int):
+                if self.first_heartbeat is True:
+                    await asyncio.sleep(self.heartbeat_interval / 1000 * self.jitter)
                     await self.socket.send_json({
                         "op": 1,
-                        "d": self.s
+                        "d": self.sequence
                     })
                     self.first_heartbeat = False
 
@@ -101,7 +106,7 @@ class GatewayWebSocket:
                     await asyncio.sleep(self.heartbeat_interval / 1000)
                     await self.socket.send_json({
                         "op": 1,
-                        "d": self.s
+                        "d": self.sequence
                     })
 
     async def listen_to_socket(self):
@@ -127,12 +132,12 @@ class GatewayWebSocket:
 
             # Handles any binary response using zlib
             elif data.type == WSMsgType.BINARY:
-                self.BUFFER.extend(payload)
+                self.buffer.extend(payload)
 
                 # Payload compression handling
-                if payload[-4:] == self.ZLIB_SUFFIX:
-                    payload = self.INFLATOR.decompress(self.BUFFER)
-                    self.BUFFER = bytearray()
+                if payload[-4:] == self.zlib_suffix:
+                    payload = self.inflator.decompress(self.buffer)
+                    self.buffer = bytearray()
 
                 # Transport compression handling, in which it uses regular compression,
                 # without the extra compression to binary format.
@@ -142,26 +147,27 @@ class GatewayWebSocket:
             json_payload = json.loads(payload)
 
             # Finds the heartbeat_interval and send `IDENTIFY`!
-            if json_payload["op"] == self.OPCODES["HELLO"]:
+            if json_payload["op"] == self.opcodes["HELLO"]:
                 self.heartbeat_interval = json_payload["d"]["heartbeat_interval"]
 
-                await self.socket.send_json(self.IDENTIFY_REQ)
+                await self.socket.send_json(self.identify_req)
 
-            elif json_payload["op"] == self.OPCODES["HEARTBEAT ACK"]:
+            elif json_payload["op"] == self.opcodes["HEARTBEAT ACK"]:
                 print("placeholder")
 
-            if json_payload["op"] == self.OPCODES["DISPATCH"]:
-                self.s = json_payload["s"]
+            if json_payload["op"] == self.opcodes["DISPATCH"]:
+                self.sequence = json_payload["s"]
 
             # TODO: Call event listeners when the class BotUser is done
 
             # Reconnect in case of any errors/gateway demand
-            if json_payload["op"] == self.OPCODES["RECONNECT"]:
+            if json_payload["op"] == self.opcodes["RECONNECT"]:
                 resume_json = {
-                    "op": self.OPCODES["RESUME"],
+                    "op": self.opcodes["RESUME"],
                     "d": {
                         "token": f"{self.bot_token}",
-                        "socket_id": self.socket_id,
+                        # Actually, the socket id is given in the READY message.
+                        "socket_id": None,
                         "seq": 1337,
                     },
                 }
@@ -176,16 +182,15 @@ class GatewayWebSocket:
             if self.socket:
                 await self.socket.close()
 
-            self.socket = await session.ws_connect(self.WSSGATEWAYURL)
+            self.socket = await session.ws_connect(self.wssurl)
 
-            print(self.SUCCESS + "Thanks for using devcord! <3")
+            print(self.success + "Thanks for using devcord! <3")
             print(
-                self.SUCCESS
+                self.success
                 + "Want to contribute, view or just star our project? Visit our github! :D"
             )
-            print(self.SUCCESS +
+            print(self.success +
                   "https://github.com/Code-Done-Right/devcord.py" + Fore.RESET)
-            print(self.SUCCESS + "Tip: Focus on the red text if any errors come, and don't forget to report to our discord!" + Fore.RESET)
 
             # We listen to socket before heartbeat to find heartbeat_interval
             await asyncio.gather(self.listen_to_socket(), self.keep_ws_alive())

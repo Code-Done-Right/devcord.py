@@ -1,9 +1,13 @@
+"""
+A module holding all classes related to the Bot User.
+"""
+
 # Imports
+import asyncio
+
 import devcord
 from devcord.httpconnection import HTTPConnection
 from devcord.gatewaywebsocket import GatewayWebSocket
-
-import asyncio
 
 
 class BotUser:
@@ -20,43 +24,53 @@ class BotUser:
     """
 
     def __init__(self, *, bot_token, intents=devcord.Intents.Standard(), prefixes=None):
+        """
+        Handles the parameters.
+        """
         self.bot_token = bot_token
         self.intents = intents
         self.prefixes = prefixes
 
-        self.ws = GatewayWebSocket(self.bot_token, self.intents)
+        self.websocket = GatewayWebSocket(self.bot_token, self.intents)
         self.http = HTTPConnection(self.bot_token, 10)
 
     async def create_session(self, bot_token):
-        if not bot_token:
-            raise devcord.InvalidSessionError("bot_token")
+        """
+        Creates a new HTTP and WebSocket session.
+        """
+        if bot_token:
+            await self.http.login()
+            await self.websocket.start()
 
         else:
-            await self.http.login()
-            await self.ws.start()
+            raise devcord.InvalidSessionError("bot_token")
 
     def run(self):
+        """
+        When called, runs the bot assuming the proper information is inputted
+        into the parameters.
+        """
         loop = asyncio.get_event_loop()
         task = loop.create_task(self.create_session(self.bot_token))
 
         try:
             loop.run_until_complete(task)
-        except KeyboardInterrupt:
+        except KeyboardInterrupt as sessions_interrupted:
             task.cancel()
 
-            if self.ws and self.ws.socket:
-                loop.run_until_complete(self.ws.socket.close())
+            if self.websocket and self.websocket.socket:
+                loop.run_until_complete(self.websocket.socket.close())
 
             if self.http and self.http.client:
                 loop.run_until_complete(self.http.client.close())
 
             raise devcord.InterruptError(error_type=KeyboardInterrupt)
 
-        except Exception:
+        except Exception as general_error:
             task.cancel()
 
-            if self.ws and self.ws.socket:
-                loop.run_until_complete(self.ws.socket.close())
+            if self.websocket and self.websocket.socket:
+                loop.run_until_complete(self.websocket.socket.close())
 
             if self.http and self.http.client:
                 loop.run_until_complete(self.http.client.close())

@@ -1,8 +1,11 @@
-# Imports
-import aiohttp
-from aiohttp import ClientSession
+"""
+A module handling all things related to the HTTP connection to the Discord API.
+"""
 
+# Imports
 import json
+
+import aiohttp
 
 
 class HTTPConnection:
@@ -20,12 +23,10 @@ class HTTPConnection:
     def __init__(self, bot_token: str, version: int, boundary="boundary"):
         # Bot User
         self.bot_token = bot_token
-        self.version = version
 
         # HTTP Client and API
         self.client: aiohttp.ClientSession = None
-        self.API_URL = f"https://discord.com/api/v{self.version}"
-        self.CDN_URL = f"https://cdn.discordapp.com/"
+        self.api_url = f"https://discord.com/api/v{version}"
 
         self.boundary = boundary
 
@@ -88,7 +89,7 @@ class HTTPConnection:
             parameters = {}
 
         if not self.client:
-            raise Exception  # TODO
+            raise Exception
 
         param_list = []
         if parameters:
@@ -112,7 +113,7 @@ class HTTPConnection:
             kws = {"json": payload} if payload else {}
 
         async with self.client.request(
-            method, f"{self.API_URL}/{endpoint}",
+            method, f"{self.api_url}/{endpoint}",
             **kws, headers={"Content-Type": content_type}
         ) as resp:
             if resp.status == 204:
@@ -125,6 +126,6 @@ class HTTPConnection:
             rs = await resp.json()
 
             if not resp.ok:
-                raise Exception  # TODO
+                raise Exception
 
             return resp
