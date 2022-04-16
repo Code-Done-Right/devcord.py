@@ -7,6 +7,8 @@ Devcord uses Discord's V9 API (The latest API version) and the latest Discord Ga
 We plan on suppporting Python 3.10, 3.9 and 3.8. ~~However the module might work fine for versions 3.7 and 3.6, although it definitely will be a bit buggy. We recommend you, the user to run it in v3.10 if possible or v3.9.~~
 The wrapper will not work on versions below Python v3.8 (non inclusive).
 
+Devcord is meant to be easy to develop and use :D
+
 # 💻 Usage
 
 Devcord is still in very early development stages, but the expected syntax will be updated everytime below:
