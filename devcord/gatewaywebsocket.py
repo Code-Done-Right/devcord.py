@@ -70,8 +70,8 @@ class GatewayWebSocket:
             },
         }
 
-        self.first_heartbeat = True
-        self.JITTER = 0.2
+        self.JITTER = 0.69420
+        self.first_heartbeat: bool = True
 
         # Miscellaneous
         self.ZLIB_SUFFIX = b"\x00\x00\xff\xff"
@@ -90,17 +90,19 @@ class GatewayWebSocket:
         while self.socket:
             if type(self.heartbeat_interval) == int:
                 if self.first_heartbeat == True:
-                    # Ran only if this is the first heartbeat
-                    await asyncio.sleep(self.heartbeat_interval * 1000 * self.JITTER)
-
-                    await self.socket.send_json({"op": self.OPCODES["HEARTBEAT"]})
+                    await asyncio.sleep(self.heartbeat_interval / 1000 * self.JITTER)
+                    await self.socket.send_json({
+                        "op": 1,
+                        "d": self.s
+                    })
                     self.first_heartbeat = False
 
                 else:
-                    # Ran only if this is not first heartbeat interval
-                    await asyncio.sleep(self.heartbeat_interval * 1000)
-
-                    await self.socket.send_json({"op": self.OPCODES["HEARTBEAT"]})
+                    await asyncio.sleep(self.heartbeat_interval / 1000)
+                    await self.socket.send_json({
+                        "op": 1,
+                        "d": self.s
+                    })
 
     async def listen_to_socket(self):
         """
@@ -147,6 +149,9 @@ class GatewayWebSocket:
 
             elif json_payload["op"] == self.OPCODES["HEARTBEAT ACK"]:
                 print("placeholder")
+
+            if json_payload["op"] == self.OPCODES["DISPATCH"]:
+                self.s = json_payload["s"]
 
             # TODO: Call event listeners when the class BotUser is done
 

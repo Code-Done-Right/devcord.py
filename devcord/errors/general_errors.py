@@ -14,7 +14,7 @@ class InterruptError(Exception):
                 "\n InterruptError \n\n A KeyBoardInterrupt happened during the execution of the code." + Fore.RESET
 
         else:
-            error = Fore.RED + "InterruptError \n\n We don't know what this error is. Maybe, try reporting to our github or discord?" + Fore.RESET
+            error = Fore.RED + "\n InterruptError \n\n We don't know what this error is. Maybe, try reporting to our github or discord?" + Fore.RESET
 
         super().__init__(error)
 
@@ -31,6 +31,6 @@ class InvalidSessionError(Exception):
             error = Fore.RED + "\n InvalidSessionError \n\n Your bot token is invalid. It does not work for logging into your bot. Regenerate your token and paste a new one here."
 
         else:
-            error = Fore.RED + "Other cases will be handled later :P"
+            error = Fore.RED + "\n Other cases will be handled later :P"
 
         super().__init__(error)

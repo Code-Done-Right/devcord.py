@@ -16,46 +16,46 @@ class GatewayErrors(Exception):
         )
 
         if code == 4000:
-            final = f"ERR {code}\n\nUnknown error\n{error}"
+            final = f"\n ERR {code}\n\nUnknown error\n{error}"
 
         elif code == 4001:
-            final = f"ERR {code}\n\nUnknown Opcode\n{error}"
+            final = f"\n ERR {code}\n\nUnknown Opcode\n{error}"
 
         elif code == 4002:
-            final = f"ERR {code}\n\nDecode Error\n{error}"
+            final = f"\n ERR {code}\n\nDecode Error\n{error}"
 
         elif code == 4003:
-            final = f"ERR {code}\n\nNot authenticated\n{error}"
+            final = f"\n ERR {code}\n\nNot authenticated\n{error}"
 
         elif code == 4004:
-            final = f"ERR {code}\n\nAuthentication failed\n{error}"
+            final = f"\n ERR {code}\n\nAuthentication failed\n{error}"
 
         elif code == 4005:
-            final = f"ERR {code}\n\nAlready authenticated\n{error}"
+            final = f"\n ERR {code}\n\nAlready authenticated\n{error}"
 
         elif code == 4007:
-            final = f"ERR {code}\n\nInvalid sequence\n{error}"
+            final = f"\n ERR {code}\n\nInvalid sequence\n{error}"
 
         elif code == 4008:
-            final = f"ERR {code}\n\nRate limited\n{error}"
+            final = f"\n ERR {code}\n\nRate limited\n{error}"
 
         elif code == 4009:
-            final = f"ERR {code}\n\nSession timed out\n{error}"
+            final = f"\n ERR {code}\n\nSession timed out\n{error}"
 
         elif code == 4010:
-            final = f"ERR {code}\n\nInvalid shard\n{error}"
+            final = f"\n ERR {code}\n\nInvalid shard\n{error}"
 
         elif code == 4011:
-            final = f"ERR {code}\n\nSharding required\n{error}"
+            final = f"\n ERR {code}\n\nSharding required\n{error}"
 
         elif code == 4012:
-            final = f"ERR {code}\n\nInvalid API version\n{error}"
+            final = f"\n ERR {code}\n\nInvalid API version\n{error}"
 
         elif code == 4013:
-            final = f"ERR {code}\n\nInvalid Intents\n{error}"
+            final = f"\n ERR {code}\n\nInvalid Intents\n{error}"
 
         elif code == 4014:
-            final = f"ERR {code}\n\nDisallowed intents\n{error}"
+            final = f"\n ERR {code}\n\nDisallowed intents\n{error}"
 
         # Final check (should not run at all)
         else:
