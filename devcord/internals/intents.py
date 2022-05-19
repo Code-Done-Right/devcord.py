@@ -2,6 +2,10 @@
 Intent calculators and intent handlers.
 """
 
+__all__ = [
+    "Intents"
+]
+
 
 class Intents:
     """
@@ -38,7 +42,8 @@ class Intents:
             "DIRECT_MESSAGES": 1 << 12,
             "DIRECT_MESSAGE_REACTIONS": 1 << 13,
             "DIRECT_MESSAGE_TYPING": 1 << 14,
-            "GUILD_SCHEDULED_EVENTS": 1 << 16,
+            "MESSAGE_CONTENT": 1 << 15,
+            "GUILD_SCHEDULED_EVENTS": 1 << 16
         }
         intent_num = 0
         for key, value in intents.items():
@@ -68,7 +73,8 @@ class Intents:
             "DIRECT_MESSAGES": 1 << 12,
             "DIRECT_MESSAGE_REACTIONS": 1 << 13,
             "DIRECT_MESSAGE_TYPING": 1 << 14,
-            "GUILD_SCHEDULED_EVENTS": 1 << 16,
+            "MESSAGE_CONTENT": 1 << 15,
+            "GUILD_SCHEDULED_EVENTS": 1 << 16
         }
         intent_num = 0
         for _, value in intents.items():

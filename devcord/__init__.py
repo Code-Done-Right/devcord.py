@@ -1,14 +1,29 @@
 """
 Devcord
 
-An asynchronous, easy to learn Discord API wrapper written in Python v3. We try to make devcord
-easy to learn and contribute to!
-Check out the github repository for official documentation and a quickstart.
-"""
-from .intents import Intents
+Devcord is an asynchronous programming-based module that uses aiohttp to make bots.
+We aim to make using and contributing to devcord as easy as humanly possible, while
+keeping necessary complexity. Thanks for using devcord! <3 
 
-from .errors.general_errors import *
-from .errors.gateway_errors import GatewayErrors
-from .errors.http_errors import HTTPErrors
+Example usage:
+
+```py
+import devcord
+
+bot = devcord.BotUser(
+    bot_token = "...",
+    intents = devcord.Intents.Standard(),
+    version = 10,
+    prefixes = ["devcord."],
+)
+
+bot.run()
+```
+"""
+
+from .internals.intents import Intents
+
+from .errors.generalerr import InterruptionError, BaseError
+from .errors.apierr import InvalidRequest
 
 from .botuser import BotUser

@@ -1,7 +1,7 @@
-# Cache files, import stuff, etc
+# Cache
 __pycache__
 node_modules
 
-# Extra stuff
+# Extras
 extras
 test.py

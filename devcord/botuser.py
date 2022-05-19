@@ -1,78 +1,84 @@
 """
-A module holding all classes related to the Bot User.
+Module handling the main bot user.
 """
 
-# Imports
 import asyncio
+import typing
+from typing import List
+from rich import print
 
-import devcord
-from devcord.httpconnection import HTTPConnection
-from devcord.gatewaywebsocket import GatewayWebSocket
+from devcord.internals.gatewaywebsocket import GatewayWebSocket
+from devcord.internals.apiconnection import APIConnection
+from devcord import Intents
+from devcord import InterruptionError, BaseError
+
+__all__ = [
+    "BotUser"
+]
 
 
 class BotUser:
     """
-    The class containing the bot user information. When initiated with valid parameters,
-    it connects to the API and gateway.
+    A simple class opening 2 websocket connections to receive and send data
+    to the Gateway and API.
 
-    Parameters:
-    - bot_token: The token of your bot user.
-    - intents?: The intent number of your bot. Defaults to the standard intents,
-    i.e `devcord.Intents.Standard`.
-    - prefixes?: the list of prefixes the bot uses in case of it using
-    prefix commands and/or slash commands.
+    Keyword Parameters:
+    - bot_token: a string giving your bot's token
+    - intents: an integer giving the enabled intents.
+    - version?: A version number that denotes the version of the gateway. Defaults to 10.
+    - prefixes?: A list of string prefixes that the Gateway will detect
+    and respond appropriately.
     """
 
-    def __init__(self, *, bot_token, intents=devcord.Intents.Standard(), prefixes=None):
-        """
-        Handles the parameters.
-        """
-        self.bot_token = bot_token
+    def __init__(
+        self,
+        *,
+        bot_token: str,
+        intents: int = Intents.All(),
+        version: int = 10,
+        prefixes: List[str] = []
+    ) -> typing.NoReturn:
+        self.token = bot_token
         self.intents = intents
+        self.version = version
+
         self.prefixes = prefixes
+        self.api = APIConnection(self.token)
+        self.gateway = GatewayWebSocket(
+            self.api, self.token, self.intents, self.version)
 
-        self.websocket = GatewayWebSocket(self.bot_token, self.intents)
-        self.http = HTTPConnection(self.bot_token, 10)
-
-    async def create_session(self, bot_token):
+    async def __start_websocket_sessions(self) -> typing.NoReturn:
         """
-        Creates a new HTTP and WebSocket session.
+        Creates new websocket sessions.
         """
-        if bot_token:
-            await self.http.login()
-            await self.websocket.start()
-
+        if self.token:
+            await self.api.authorize_and_login()
+            await self.gateway.start_websocket()
         else:
-            raise devcord.InvalidSessionError("bot_token")
+            raise Exception
 
-    def run(self):
+    def run(self) -> typing.NoReturn:
         """
-        When called, runs the bot assuming the proper information is inputted
-        into the parameters.
+        Starts a new session when ran properly.
         """
+        print(
+            f"[sea_green2]:D[/sea_green2] [green1]Thank you for using devcord! <3[/green1]")
+        print(f"[sea_green2]:D[/sea_green2] [green1]Want to ask for help, look at devcord's source code, or just chill?[/green1]")
+        print(f"[sea_green2]:D[/sea_green2] [green1]Join our Discord! https://discord.gg/r4pudcvBb7[/green1]")
+        print(f"[sea_green2]:D[/sea_green2] [green1]Github: https://github.com/Code-Done-Right/devcord.py[/green1]")
+        print("[green1]|---------------------------|[/green1]")
+
+        if self.version != 10:
+            print(f"[gold3]You specified a version which is not recommended.[/gold3]")
+
+        elif self.version <= 6 or self.version > 10:
+            print(
+                f"[red1]:/[/red1] [dark_red]You cannot use these versions.[/dark_red]")
+
         loop = asyncio.get_event_loop()
-        task = loop.create_task(self.create_session(self.bot_token))
-
+        task = loop.create_task(self.__start_websocket_sessions())
         try:
             loop.run_until_complete(task)
-        except KeyboardInterrupt as sessions_interrupted:
-            task.cancel()
-
-            if self.websocket and self.websocket.socket:
-                loop.run_until_complete(self.websocket.socket.close())
-
-            if self.http and self.http.client:
-                loop.run_until_complete(self.http.client.close())
-
-            raise devcord.InterruptError(error_type=KeyboardInterrupt)
-
-        except Exception as general_error:
-            task.cancel()
-
-            if self.websocket and self.websocket.socket:
-                loop.run_until_complete(self.websocket.socket.close())
-
-            if self.http and self.http.client:
-                loop.run_until_complete(self.http.client.close())
-
-            raise devcord.InterruptError(error_type=Exception)
+        except KeyboardInterrupt:
+            InterruptionError.error(1)
+            raise BaseError

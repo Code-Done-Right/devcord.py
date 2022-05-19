@@ -1,11 +1,11 @@
-# 🙋‍♂️ Contribution 
+# 🙋‍♂️ Contribution
 
-Devcord is based on it's users and how much they love our module and our hard work. We are currently too small for
-a sponsor, but you can always help us by contributing <3
+Devcord is based on it's users and how much they love our module and our hard work. We are currently too small for a sponsor, but you can always help us by contributing <3
 
 # ❓ How do I contribute properly?
 
 There are multiple ways you can find ways to contribute to us.
+
 - Hunt for `TODO`s and `BUG`s in code comments
 - Issues
 - Fixing existing PRs

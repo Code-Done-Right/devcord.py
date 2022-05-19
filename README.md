@@ -1,13 +1,10 @@
 # ❓ Devcord
 
-Devcord is a basic Python based Discord API wrapper. The docs, when released, will be linked soon!
+Devcord is a Python based Discord API wrapper. We use Discord's V10 API (The latest API version) and the latest Discord Gateway.
 
-Devcord uses Discord's V9 API (The latest API version) and the latest Discord Gateway.
+We are still in the alpha stages of development.
 
-We plan on suppporting Python 3.10, 3.9 and 3.8. ~~However the module might work fine for versions 3.7 and 3.6, although it definitely will be a bit buggy. We recommend you, the user to run it in v3.10 if possible or v3.9.~~
-The wrapper will not work on versions below Python v3.8 (non inclusive).
-
-Devcord is meant to be easy to develop and use :D
+Devcord is well-tested on Python v3.10, but ideally v3.9 and v3.8 should work with equal performance.
 
 # 💻 Usage
 
@@ -15,7 +12,6 @@ Devcord is still in very early development stages, but the expected syntax will 
 
 ```py
 import devcord
-from devcord.command_implements import SlashCommand, PrefixCommand
 
 INTENTS = devcord.Intents.All()
 
@@ -24,10 +20,6 @@ bot = devcord.BotUser(
         intents = INTENTS,
         prefixes = ['devcord', 'devcord.']
     )
-
-@bot.command(implements = [SlashCommand, PrefixCommand])
-async def ping(ctx):
-    await ctx.reply('Pong!')
 
 bot.run()
 ```
