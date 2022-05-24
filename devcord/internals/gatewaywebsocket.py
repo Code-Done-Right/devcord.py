@@ -41,7 +41,7 @@ class GatewayWebSocket:
         bot_token: Optional[str],
         intents: Optional[int],
         version: Optional[int] = 10
-    ) -> typing.NoReturn:
+    ):
         # Client side
         self.api = api
         self.token = bot_token
@@ -71,7 +71,9 @@ class GatewayWebSocket:
             "HELLO":                   10,
             "HEARTBEAT ACK":           11
         }
-        self.heartbeat_interval: int = None
+        self.heartbeat_interval: int = 41250
+        # I am setting the heartbeat interval, because if for some reason a delay happens
+        # while Discord gives the heartbeat interval, it will raise an exception.
         self.first: bool = True
 
     async def __send_identify_packet(self):
@@ -141,7 +143,11 @@ class GatewayWebSocket:
                 if json_payload["op"] == self.opcodes["DISPATCH"]:
                     self.sequence = json_payload["s"]
 
-    async def start_websocket(self) -> typing.NoReturn:
+                    if json_payload["t"] == "MESSAGE_CREATE":
+                        if json_payload["d"]["content"] == "hello":
+                            await self.api.request("POST", "/channels/969944742584549430/messages", payload={"content": "It works, finally!"})
+
+    async def start_websocket(self):
         """
         Starts the WebSocket!
         """

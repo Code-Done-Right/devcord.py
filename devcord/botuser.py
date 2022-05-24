@@ -37,7 +37,7 @@ class BotUser:
         intents: int = Intents.All(),
         version: int = 10,
         prefixes: List[str] = []
-    ) -> typing.NoReturn:
+    ):
         self.token = bot_token
         self.intents = intents
         self.version = version
@@ -57,7 +57,7 @@ class BotUser:
         else:
             raise Exception
 
-    def run(self) -> typing.NoReturn:
+    def run(self):
         """
         Starts a new session when ran properly.
         """

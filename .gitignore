@@ -5,3 +5,4 @@ node_modules
 # Extras
 extras
 test.py
+goal.py
