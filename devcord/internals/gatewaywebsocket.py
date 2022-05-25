@@ -14,6 +14,7 @@ import aiohttp
 from aiohttp import ClientSession, WSMsgType
 from devcord import Intents
 from devcord.internals.apiconnection import APIConnection
+from devcord.errors.generalerr import BaseError
 
 
 __all__ = [
@@ -141,11 +142,30 @@ class GatewayWebSocket:
                     await self.__send_identify_packet()
 
                 if json_payload["op"] == self.opcodes["DISPATCH"]:
+                    if json_payload["t"] == "READY":
+                        self.session_id = json_payload["d"]["session_id"]
+
                     self.sequence = json_payload["s"]
 
-                    if json_payload["t"] == "MESSAGE_CREATE":
-                        if json_payload["d"]["content"] == "hello":
-                            await self.api.request("POST", "/channels/969944742584549430/messages", payload={"content": "It works, finally!"})
+                if json_payload["op"] == self.opcodes["INVALID SESSION"]:
+                    if json_payload["d"] == False:
+                        print(
+                            "[red1]:/[/red1] [dark_red]The session did not properly open because your token, version, or something else was invalid.[/dark_red]")
+                        raise BaseError
+                    else:
+                        await self.__send_identify_packet()
+
+                if json_payload["op"] == self.opcodes["RECONNECT"]:
+                    await self.socket.send_json(
+                        {
+                            "op": self.opcodes["RESUME"],
+                            "d": {
+                                "token": self.token,
+                                "session_id": self.session_id,
+                                "seq": self.sequence
+                            }
+                        }
+                    )
 
     async def start_websocket(self):
         """
